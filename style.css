@@ -76,6 +76,27 @@ select:focus {
     border-color: #667eea;
 }
 
+.text-input {
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 20px;
+    background: white;
+    font-size: 14px;
+    min-width: 150px;
+    transition: border-color 0.3s ease;
+    font-family: 'Microsoft JhengHei', 'Arial', sans-serif;
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+}
+
+.text-input::placeholder {
+    color: #999;
+}
+
 .staff-container {
     background: white;
     border-radius: 10px;
@@ -125,13 +146,19 @@ select:focus {
 
 /* 音符文字 */
 .note-text {
-    font-family: 'Georgia', serif;
-    font-size: 18px;
+    font-family: 'Microsoft JhengHei', 'Arial', serif;
+    font-size: 16px;
     font-weight: bold;
     fill: #2c3e50;
     text-anchor: middle;
     user-select: none;
     pointer-events: none;
+    dominant-baseline: central;
+}
+
+.note-text.custom-text {
+    font-size: 18px;
+    fill: #1a1a1a;
 }
 
 /* 音符方塊 */
@@ -157,6 +184,16 @@ select:focus {
 
 .note-rect.eighth {
     fill: #f9ca24;
+}
+
+.note-rect.text {
+    fill: #ff9ff3;
+    stroke: #8e44ad;
+    stroke-width: 2;
+}
+
+.note-rect.text:hover {
+    fill: #f368e0;
 }
 
 /* 調整大小控制點 */

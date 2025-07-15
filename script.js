@@ -27,8 +27,17 @@ class MusicEditor {
     initializeEventListeners() {
         // 工具欄按鈕
         document.getElementById('addNote').addEventListener('click', () => this.addNote());
+        document.getElementById('addTextNote').addEventListener('click', () => this.addTextNote());
         document.getElementById('playButton').addEventListener('click', () => this.togglePlayback());
         document.getElementById('clearAll').addEventListener('click', () => this.clearAllNotes());
+        
+        // 文字輸入框事件
+        const textInput = document.getElementById('noteText');
+        textInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.addTextNote();
+            }
+        });
         
         // 五線譜點擊事件
         document.getElementById('musicStaff').addEventListener('click', (e) => this.handleStaffClick(e));
@@ -56,11 +65,46 @@ class MusicEditor {
             width: this.getNoteWidth(noteType),
             type: noteType,
             pitch: this.getPitchFromY(y),
+            text: null,
+            isTextNote: false,
             element: null
         };
         
         this.createNoteElement(note);
         this.notes.push(note);
+        this.updateInfoPanel();
+    }
+    
+    addTextNote(x = 100, y = 120) {
+        const textInput = document.getElementById('noteText');
+        const text = textInput.value.trim();
+        
+        if (!text) {
+            alert('請輸入要顯示的文字！');
+            textInput.focus();
+            return;
+        }
+        
+        const noteId = `text_note_${this.noteCounter++}`;
+        
+        const note = {
+            id: noteId,
+            x: x,
+            y: y,
+            width: Math.max(60, text.length * 25), // 根據文字長度計算寬度
+            type: 'text',
+            pitch: this.getPitchFromY(y),
+            text: text,
+            isTextNote: true,
+            element: null
+        };
+        
+        this.createNoteElement(note);
+        this.notes.push(note);
+        
+        // 清空輸入框
+        textInput.value = '';
+        
         this.updateInfoPanel();
     }
     
@@ -87,16 +131,19 @@ class MusicEditor {
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.classList.add('note-rect', note.type);
         rect.setAttribute('x', note.x);
-        rect.setAttribute('y', note.y - 10);
+        rect.setAttribute('y', note.y - 15);
         rect.setAttribute('width', note.width);
-        rect.setAttribute('height', 20);
+        rect.setAttribute('height', 30);
         
         // 音符文字
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.classList.add('note-text');
+        if (note.isTextNote) {
+            text.classList.add('custom-text');
+        }
         text.setAttribute('x', note.x + note.width / 2);
-        text.setAttribute('y', note.y + 5);
-        text.textContent = note.pitch;
+        text.setAttribute('y', note.y);
+        text.textContent = note.isTextNote ? note.text : note.pitch;
         
         // 調整大小控制點
         const resizeHandle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -208,17 +255,21 @@ class MusicEditor {
     updateNotePosition(note, x, y) {
         note.x = x;
         note.y = y;
-        note.pitch = this.getPitchFromY(y);
+        if (!note.isTextNote) {
+            note.pitch = this.getPitchFromY(y);
+        }
         
         const rect = note.element.querySelector('.note-rect');
         const text = note.element.querySelector('.note-text');
         const handle = note.element.querySelector('.resize-handle');
         
         rect.setAttribute('x', x);
-        rect.setAttribute('y', y - 10);
+        rect.setAttribute('y', y - 15);
         text.setAttribute('x', x + note.width / 2);
-        text.setAttribute('y', y + 5);
-        text.textContent = note.pitch;
+        text.setAttribute('y', y);
+        if (!note.isTextNote) {
+            text.textContent = note.pitch;
+        }
         handle.setAttribute('cx', x + note.width);
         handle.setAttribute('cy', y);
         
@@ -295,7 +346,14 @@ class MusicEditor {
         // 只在五線譜區域內添加音符
         if (x >= 50 && x <= 750 && y >= 70 && y <= 170) {
             const snappedY = this.snapToStaffLine(y);
-            this.addNote(x, snappedY);
+            
+            // 檢查是否有文字輸入
+            const textInput = document.getElementById('noteText');
+            if (textInput.value.trim()) {
+                this.addTextNote(x, snappedY);
+            } else {
+                this.addNote(x, snappedY);
+            }
         }
     }
     
@@ -434,18 +492,29 @@ class MusicEditor {
             const duration = (this.selectedNote.width / 40) * 0.5;
             const position = ((this.selectedNote.x - 50) / 650) * 100;
             
-            infoDiv.innerHTML = `
-                <strong>已選中音符:</strong><br>
-                音高: ${this.selectedNote.pitch}<br>
-                類型: ${this.getTypeDisplayName(this.selectedNote.type)}<br>
-                持續時間: ${duration.toFixed(2)}秒<br>
-                位置: ${position.toFixed(1)}%<br>
-                <small>使用方向鍵移動，空格鍵播放，Delete刪除</small>
-            `;
+            if (this.selectedNote.isTextNote) {
+                infoDiv.innerHTML = `
+                    <strong>已選中文字音符:</strong><br>
+                    文字內容: "${this.selectedNote.text}"<br>
+                    位置: ${position.toFixed(1)}%<br>
+                    寬度: ${this.selectedNote.width}px<br>
+                    <small>使用方向鍵移動，拖拽右側控制點調整寬度，Delete刪除</small>
+                `;
+            } else {
+                infoDiv.innerHTML = `
+                    <strong>已選中音符:</strong><br>
+                    音高: ${this.selectedNote.pitch}<br>
+                    類型: ${this.getTypeDisplayName(this.selectedNote.type)}<br>
+                    持續時間: ${duration.toFixed(2)}秒<br>
+                    位置: ${position.toFixed(1)}%<br>
+                    <small>使用方向鍵移動，空格鍵播放，Delete刪除</small>
+                `;
+            }
         } else {
             infoDiv.innerHTML = `
                 <strong>音符編輯器使用說明:</strong><br>
                 • 點擊五線譜添加音符<br>
+                • 輸入文字後點擊五線譜添加文字音符<br>
                 • 拖拽音符改變位置和音高<br>
                 • 拖拽右側控制點調整音符長度<br>
                 • 雙擊音符播放聲音<br>
@@ -477,8 +546,16 @@ window.addEventListener('load', () => {
             // 添加一些示例音符
             window.musicEditor.addNote(120, 120); // C5
             window.musicEditor.addNote(200, 100); // G5
-            window.musicEditor.addNote(280, 140); // C5
-            window.musicEditor.addNote(360, 120); // E5
+            
+            // 添加文字音符示例
+            document.getElementById('noteText').value = '你好';
+            window.musicEditor.addTextNote(280, 140);
+            
+            document.getElementById('noteText').value = '音樂';
+            window.musicEditor.addTextNote(400, 120);
+            
+            // 清空輸入框
+            document.getElementById('noteText').value = '';
         }
     }, 500);
 });
