@@ -82,7 +82,7 @@ select:focus {
     border-radius: 20px;
     background: white;
     font-size: 14px;
-    min-width: 150px;
+    min-width: 250px;
     transition: border-color 0.3s ease;
     font-family: 'Microsoft JhengHei', 'Arial', sans-serif;
 }

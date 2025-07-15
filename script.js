@@ -28,6 +28,7 @@ class MusicEditor {
         // 工具欄按鈕
         document.getElementById('addNote').addEventListener('click', () => this.addNote());
         document.getElementById('addTextNote').addEventListener('click', () => this.addTextNote());
+        document.getElementById('addTextSequence').addEventListener('click', () => this.addTextSequence());
         document.getElementById('playButton').addEventListener('click', () => this.togglePlayback());
         document.getElementById('clearAll').addEventListener('click', () => this.clearAllNotes());
         
@@ -35,7 +36,7 @@ class MusicEditor {
         const textInput = document.getElementById('noteText');
         textInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                this.addTextNote();
+                this.addTextSequence();
             }
         });
         
@@ -106,6 +107,100 @@ class MusicEditor {
         textInput.value = '';
         
         this.updateInfoPanel();
+    }
+    
+    addTextSequence() {
+        const textInput = document.getElementById('noteText');
+        const text = textInput.value.trim();
+        
+        if (!text) {
+            alert('請輸入要轉換的文字！');
+            textInput.focus();
+            return;
+        }
+        
+        // 字符到音高的映射表
+        const charToNote = {
+            'a': 160, 'A': 160, // A4
+            'b': 150, 'B': 150, // B4
+            'c': 140, 'C': 140, // C5
+            'd': 130, 'D': 130, // D5
+            'e': 120, 'E': 120, // E5
+            'f': 110, 'F': 110, // F5
+            'g': 100, 'G': 100, // G5
+            'h': 90,  'H': 90,  // A5
+            'i': 80,  'I': 80,  // B5
+            'j': 70,  'J': 70,  // C6
+            'k': 160, 'K': 160, // A4
+            'l': 150, 'L': 150, // B4
+            'm': 140, 'M': 140, // C5
+            'n': 130, 'N': 130, // D5
+            'o': 120, 'O': 120, // E5
+            'p': 110, 'P': 110, // F5
+            'q': 100, 'Q': 100, // G5
+            'r': 90,  'R': 90,  // A5
+            's': 80,  'S': 80,  // B5
+            't': 70,  'T': 70,  // C6
+            'u': 160, 'U': 160, // A4
+            'v': 150, 'V': 150, // B4
+            'w': 140, 'W': 140, // C5
+            'x': 130, 'X': 130, // D5
+            'y': 120, 'Y': 120, // E5
+            'z': 110, 'Z': 110, // F5
+            '0': 160, '1': 150, '2': 140, '3': 130, '4': 120,
+            '5': 110, '6': 100, '7': 90, '8': 80, '9': 70,
+            ' ': 170, // 空格對應 G4（休止符）
+            '!': 70, '?': 80, '.': 90, ',': 100,
+            '你': 160, '我': 150, '他': 140, '她': 130, '它': 120,
+            '是': 110, '的': 100, '了': 90, '在': 80, '有': 70,
+            '和': 160, '就': 150, '不': 140, '人': 130, '都': 120,
+            '一': 110, '二': 100, '三': 90, '四': 80, '五': 70,
+            '六': 160, '七': 150, '八': 140, '九': 130, '十': 120
+        };
+        
+        const noteType = document.getElementById('noteType').value;
+        const noteWidth = this.getNoteWidth(noteType);
+        let currentX = 100; // 起始 X 位置
+        const spacing = noteWidth + 10; // 音符間距
+        
+        // 為每個字符創建音符
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            let y = charToNote[char] || 120; // 默認為 E5
+            
+            const noteId = `char_note_${this.noteCounter++}`;
+            
+            const note = {
+                id: noteId,
+                x: currentX,
+                y: y,
+                width: noteWidth,
+                type: noteType,
+                pitch: this.getPitchFromY(y),
+                text: char,
+                isTextNote: true,
+                element: null
+            };
+            
+            this.createNoteElement(note);
+            this.notes.push(note);
+            
+            currentX += spacing;
+            
+            // 如果超出畫布寬度，換到下一行
+            if (currentX > 700) {
+                currentX = 100;
+                // 可以在這裡添加換行邏輯
+            }
+        }
+        
+        // 清空輸入框
+        textInput.value = '';
+        
+        this.updateInfoPanel();
+        
+        // 顯示成功消息
+        alert(`成功轉換了 ${text.length} 個字符為音符！`);
     }
     
     getNoteWidth(type) {
