@@ -12,12 +12,128 @@ body {
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1400px;
     margin: 0 auto;
     background: white;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 30px;
+    min-height: 90vh;
+}
+
+/* 主要佈局 - 筆記型電腦風格 */
+.main-layout {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* 左側工作區域 */
+.workspace {
+    flex: 2;
+    background: #fafbfc;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e1e8ed;
+}
+
+/* 右側控制面板 */
+.control-panel {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e1e8ed;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* 段落容器 */
+.sections-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 音樂段落 */
+.music-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    border: 2px solid #e1e8ed;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.music-section:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+}
+
+.music-section.active {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+/* 段落標題 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e8ed;
+}
+
+.section-header h3 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.delete-section-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-section-btn:hover {
+    background: #ff3742;
+    transform: scale(1.1);
+}
+
+/* 添加段落按鈕 */
+.add-section-area {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.add-section-btn {
+    background: #667eea;
+    color: white;
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    padding: 15px 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+.add-section-btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 h1 {
@@ -196,18 +312,33 @@ select:focus {
     fill: #f368e0;
 }
 
-/* 調整大小控制點 */
-.resize-handle {
-    fill: #667eea;
-    stroke: white;
-    stroke-width: 2;
-    cursor: ew-resize;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+/* 音符選中狀態 */
+.note.selected .note-rect {
+    stroke: #ff4757;
+    stroke-width: 3;
+    stroke-dasharray: 5,5;
+    animation: selectedPulse 1.5s ease-in-out infinite;
 }
 
-.note:hover .resize-handle {
-    opacity: 1;
+@keyframes selectedPulse {
+    0%, 100% {
+        stroke-opacity: 1;
+    }
+    50% {
+        stroke-opacity: 0.5;
+    }
+}
+
+/* 音符懸停效果 */
+.note:hover .note-rect {
+    transform: scale(1.05);
+    transform-origin: center;
+    transition: transform 0.2s ease;
+}
+
+.note {
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .info-panel {
@@ -237,61 +368,241 @@ select:focus {
     animation: playback linear;
 }
 
-/* 響應式設計 */
-@media (max-width: 768px) {
-    .container {
-        padding: 20px;
-        margin: 10px;
-    }
-    
-    h1 {
-        font-size: 2em;
-    }
-    
-    .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .btn {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    
-    #musicStaff {
-        width: 100%;
-        height: auto;
-    }
+/* 控制面板樣式 */
+.panel-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e1e8ed;
 }
 
-/* 音符拖拽時的視覺反饋 */
-.drop-zone {
-    fill: rgba(102, 126, 234, 0.1);
-    stroke: #667eea;
-    stroke-width: 2;
-    stroke-dasharray: 5,5;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+.panel-section:last-child {
+    border-bottom: none;
 }
 
-.drop-zone.active {
-    opacity: 1;
+.panel-section h3 {
+    color: #2c3e50;
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+    font-weight: 600;
 }
 
-/* 工具提示 */
-.tooltip {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
+/* 垂直工具列 */
+.toolbar-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toolbar-vertical .btn {
+    width: 100%;
+    margin: 0;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+/* 次要按鈕樣式 */
+.btn.secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn.secondary:hover {
+    background: #5a6268;
+    border-color: #545b62;
+}
+
+/* 文字輸入框調整 */
+.text-input {
+    width: 100%;
+    min-width: auto;
+    margin-bottom: 10px;
+}
+
+/* 音符類型選擇器 */
+.note-type-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.note-type-select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* 段落控制 */
+.section-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 五線譜容器調整 */
+.staff-container {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e1e8ed;
+}
+
+/* 語音錄音控制樣式 */
+.voice-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.voice-btn {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    font-size: 14px;
     padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.2s ease;
 }
 
-.tooltip.show {
-    opacity: 1;
+.voice-btn:hover:not(:disabled) {
+    background: #c0392b;
+    border-color: #c0392b;
+}
+
+.voice-btn:disabled {
+    background: #95a5a6;
+    border-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.recording-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #e1e8ed;
+}
+
+.recording-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #95a5a6;
+    transition: all 0.3s ease;
+}
+
+.recording-indicator.active {
+    background: #e74c3c;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.voice-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.voice-settings label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.voice-settings input[type="range"] {
+    width: 100%;
+    margin: 2px 0;
+}
+
+/* 音高分析樣式 */
+.pitch-analysis {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#pitchVisualization {
+    border: 1px solid #e1e8ed;
+    border-radius: 5px;
+    background: #f8f9fa;
+    width: 100%;
+    height: auto;
+}
+
+#pitchInfo {
+    font-size: 12px;
+    color: #666;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.pitch-correction {
+    display: flex;
+    gap: 5px;
+}
+
+.correction-btn {
+    flex: 1;
+    font-size: 12px;
+    padding: 6px 8px;
+    background: #3498db;
+    border-color: #3498db;
+}
+
+.correction-btn:hover:not(:disabled) {
+    background: #2980b9;
+    border-color: #2980b9;
+}
+
+.correction-btn:disabled {
+    background: #95a5a6;
+    border-color: #95a5a6;
+}
+
+/* 響應式調整 */
+@media (max-width: 1200px) {
+    .main-layout {
+        flex-direction: column;
+    }
+    
+    .control-panel {
+        max-height: none;
+        order: -1;
+    }
+    
+    .panel-section {
+        display: inline-block;
+        width: calc(50% - 15px);
+        margin-right: 15px;
+        vertical-align: top;
+    }
+    
+    .toolbar-vertical {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .toolbar-vertical .btn {
+        width: calc(50% - 5px);
+    }
+}
+
+@media (max-width: 768px) {
+    .panel-section {
+        width: 100%;
+        margin-right: 0;
+        display: block;
+    }
+    
+    .toolbar-vertical .btn {
+        width: 100%;
+    }
 }
