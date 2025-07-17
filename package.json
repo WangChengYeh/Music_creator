@@ -1,0 +1,12 @@
+{
+  "name": "music_creator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.6.1",
+    "jsdom": "^22.1.0"
+  }
+}

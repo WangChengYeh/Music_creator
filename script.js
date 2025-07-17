@@ -622,7 +622,8 @@ class MusicEditor {
     
     togglePlayback() {
         const button = document.getElementById('playButton');
-        const playbackLine = document.getElementById('playbackLine');
+        // 以 CSS class 查找播放指示線，避免依賴唯一 ID
+        const playbackLine = document.querySelector('.playbackLine');
         
         if (this.isPlaying) {
             this.stopPlayback();
@@ -635,8 +636,8 @@ class MusicEditor {
     
     startPlayback() {
         this.isPlaying = true;
-        const playbackLine = document.getElementById('playbackLine');
-        const svg = document.getElementById('musicStaff');
+        const playbackLine = document.querySelector('.playbackLine');
+        const svg = document.querySelector('.musicStaff');
         
         playbackLine.style.display = 'block';
         playbackLine.style.transform = 'translateX(0)';
@@ -661,7 +662,7 @@ class MusicEditor {
     
     stopPlayback() {
         this.isPlaying = false;
-        const playbackLine = document.getElementById('playbackLine');
+        const playbackLine = document.querySelector('.playbackLine');
         playbackLine.style.display = 'none';
         playbackLine.style.transition = 'none';
         playbackLine.style.transform = 'translateX(0)';
